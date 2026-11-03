@@ -22,7 +22,7 @@
 After an earthquake some buildings are badly shaken while the one next door hardly moves. Part of the answer is rhythm. Every building has its own slow, regular sway, and the ground has a favourite rhythm too. If the two match, each shove adds to the last, like pushing a child on a swing at just the right moment. What decides a building's rhythm, and how bad is the match? (This repo is for learning. It is a simplified model and must never be used to design or judge a real building.)
 
 ## B. Concept and theory
-Picture the whole building as one lump of mass m on one spring of stiffness k, where k is the sideways force needed per metre of sway. Pull it sideways and let go: it swings back and forth. The angular frequency w = sqrt(k / m) tells how fast the cycle goes in radians per second, and the period T = 2 pi / w is the time for one full back-and-forth sway. Heavier means slower, stiffer means faster. For typical frame buildings engineers often use the rough empirical rule of thumb T about 0.1 N seconds for N storeys; it is only a guide. When the ground is shaken back and forth with period Tg, the gain says how much the sway is amplified compared with a very slow push. With r = T / Tg and a damping ratio zeta (typically 0.05, meaning the sway dies away by a few percent each cycle), the gain is 1 / sqrt((1 - r^2)^2 + (2 zeta r)^2). Session 2 derives it.
+Picture the whole building as one lump of mass m on one spring of stiffness k, where k is the sideways force needed per metre of sway. Pull it sideways and let go: it swings back and forth. The angular frequency w = sqrt(k / m) tells how fast the cycle goes in radians per second, and the period T = 2 pi / w is the time for one full back-and-forth sway. Heavier means slower, stiffer means faster. For typical frame buildings engineers often use the rough empirical rule of thumb T = 0.1 N seconds for a building of N storeys (a 10-storey frame: about 1 s); it is only a guide. When the ground is shaken back and forth with period Tg, the gain says how much the sway is amplified compared with a very slow push. With r = T / Tg and a damping ratio zeta (typically 0.05, meaning each swing is about 27 percent smaller than the one before), the gain is 1 / sqrt((1 - r^2)^2 + (2 zeta r)^2). Session 2 derives it.
 
 | Symbol | Meaning | Unit |
 |---|---|---|
@@ -95,6 +95,7 @@ Think of a child on a swing: what changes if the child is heavier? Then think ab
 A larger mass is harder to accelerate for the same spring force, so each swing takes longer; a stiffer spring pulls back harder for the same sway, so each swing is quicker. That is T = 2 pi sqrt(m / k). When the ground's period equals the building's, every shove arrives just as the building is already moving the same way, so the effects add up cycle after cycle and only damping limits the sway. Even small pushes can build up to a large sway: at 5 percent damping the gain at resonance is 10.
 
 </details>
+
 **Question type B: Numerical.** A building lump has m = 500 000 kg and k = 20 000 000 N/m. Find w and T and say whether it is close to the 1 s ground period.
 
 <details>
@@ -110,6 +111,7 @@ w = sqrt(k / m), then T = 2 pi / w. Check the units: k / m is in N/m per kg = 1/
 w = sqrt(20 000 000 / 500 000) = sqrt(40) = 6.325 rad/s. T = 2 pi / 6.325 = 0.9935 s. That is within 1 percent of the 1 s ground period, so this building is almost at resonance and would be strongly amplified (about 10 times). Sanity check: it is heavier than the worked example (200 000 kg, T = 0.628 s), so its period is longer.
 
 </details>
+
 **Question type C: Graph and simulation interpretation.** On the gain graph a 1 s building is shaken by a ground whose period is 2 s, and then by one with period 0.5 s. Read the gain in each case and say what each tells an engineer.
 
 <details>
@@ -125,6 +127,7 @@ The ratio is r = T / Tg = building period over ground period. Use the formula or
 With Tg = 2 s, r = 0.5 and the gain is 1.33: the building mostly follows the slow ground motion, a little amplified. With Tg = 0.5 s, r = 2 and the gain is 0.33: the shaking is too quick for the building to follow, so it hardly moves. Both are far from the resonance peak of 10 at Tg = 1 s.
 
 </details>
+
 **Question type D: Design and optimisation challenge.** A building has m = 200 000 kg and the ground period is 1 s. Choose a stiffness k that makes its period 0.5 s (a stiff design) or 1.5 s (a flexible design). What does each give for the gain, and what is the downside of each?
 
 <details>
@@ -149,7 +152,7 @@ Score yourself with [RUBRIC.md](../../RUBRIC.md). Print the [activity sheet](act
 | A stronger building is automatically safer in an earthquake. | Strength and stiffness are different. Stiffness sets the sway period; what matters is how that period sits against the shaking, and how much sway the building can survive. |
 | The ground shaking is the same for every building. | The shaking is the same, the response is not: a building amplifies the shaking strongly if its period is close to the ground period and hardly at all if it is far from it. |
 | The rule T = 0.1 N seconds is a law of nature. | It is a rough empirical rule for typical frame buildings. Walls, tall slender towers and soft soils can differ a lot, and real periods should be calculated or measured. |
-| A heavier building sways more slowly because gravity pulls it down. | The period depends on the mass-to-stiffness ratio. Doubling both the mass and the stiffness leaves the period unchanged. |
+| A heavier building sways more slowly because gravity pulls it down. | Extra mass slows the sway because a heavier lump is harder to speed up and turn around (inertia), not because of gravity. The period depends on the mass-to-stiffness ratio: doubling both the mass and the stiffness leaves it unchanged. |
 
 ## Glossary
 - **period**: time for one full back-and-forth sway, in seconds

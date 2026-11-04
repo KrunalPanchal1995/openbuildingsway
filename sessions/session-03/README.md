@@ -73,6 +73,12 @@ The first figure has three panels. On the left, the first three mode shapes of t
 
 *Peak inter-storey drift per storey: a soft first storey (35 percent stiffness) concentrates the drift.*
 
+**Rayleigh damping.** Many analysis programs build the damping matrix as C = a0 M + a1 K without knowing the modes. A mode of angular frequency w then gets zeta(w) = a0 / (2 w) + a1 w / 2. Choosing 5 percent at two modes (here modes 1 and 3) fixes a0 and a1; the other modes follow: 3.9 percent in mode 2 and 5.0, 6.3, 7.6 ... 11.6 percent from mode 3 to mode 10, because the stiffness part damps high modes more. Anchoring at modes 1 and 10 instead keeps every mode between 2.6 and 5 percent. `rayleigh_damping(M, K, w, modes=(0, 2))` returns C, a0 and a1, and `rayleigh_ratio` gives the ratio of any mode. For this building, whose motion is dominated by the first mode, both damping models give the same roof peak (171.9 mm), but a record that excites high modes would be damped more by the Rayleigh matrix.
+
+![Damping ratio against mode number for two Rayleigh anchors, compared with 5 percent in every mode.](../../docs/figures/s03_rayleigh_damping.png)
+
+*Damping ratio against mode number for two Rayleigh anchors, compared with 5 percent in every mode.*
+
 ## D. Interactive simulation
 Run the lesson (`python start.py 3`), then open the live app: [Session 3: modes of an N-storey shear building](https://krunalpanchal1995.github.io/openbuildingsway/session-03/) (or `app.html` in this folder). Change the number of storeys, mass, stiffness and the strength of the first storey, and pick a mode: watch the mode shape, the period list, the effective mass and the drift profile. The app uses the same maths as the lesson for the mode shapes and periods.
 

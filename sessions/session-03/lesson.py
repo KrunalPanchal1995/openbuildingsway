@@ -125,10 +125,39 @@ def synthetic_ground(seed=7, t_dom=1.0, dur=24.0, dt=0.01, pga=2.0):
 # **Direct Newmark-beta.** Step the full matrix equation with the *average acceleration*
 # method, beta = 1/4 and gamma = 1/2: unconditionally stable, and no numerical damping.
 # The damping matrix C = M Phi diag(2 zeta w) Phi^T M gives exactly zeta in every mode.
+#
+# **Rayleigh damping.** Many programs do not know the modes in advance and build
+# C = a0 M + a1 K instead. Mode i then gets zeta_i = a0 / (2 w_i) + a1 w_i / 2: the mass part
+# damps low modes most, the stiffness part damps high modes most, so zeta is high at both ends
+# and lowest in between. Choose two modes, set zeta there (5 percent), and solve for a0 and a1.
 
 # %%
 def damping_matrix(M, phi, w, zeta=ZETA):
     return M @ phi @ np.diag(2 * zeta * w) @ phi.T @ M
+
+
+def rayleigh_coefficients(w_a, w_b, zeta_a=ZETA, zeta_b=ZETA):
+    """a0, a1 of C = a0 M + a1 K that give damping ratio zeta_a at w_a and zeta_b at w_b (rad/s).
+
+    A mode with frequency w gets zeta(w) = a0 / (2 w) + a1 w / 2, so two chosen modes give two
+    linear equations for a0 and a1."""
+    A = np.array([[1 / (2 * w_a), w_a / 2], [1 / (2 * w_b), w_b / 2]])
+    return tuple(np.linalg.solve(A, [zeta_a, zeta_b]))
+
+
+def rayleigh_damping(M, K, w, modes=(0, 2), zeta=ZETA):
+    """Rayleigh damping matrix C = a0 M + a1 K with `zeta` at the two chosen modes (0-based indices).
+
+    Returns C, a0, a1. Unlike damping_matrix (the same zeta in every mode), the other modes get
+    whatever the formula gives: see rayleigh_ratio."""
+    a0, a1 = rayleigh_coefficients(w[modes[0]], w[modes[1]], zeta, zeta)
+    return a0 * M + a1 * K, a0, a1
+
+
+def rayleigh_ratio(w, a0, a1):
+    """Damping ratio the Rayleigh matrix gives to a mode of frequency w (scalar or array)."""
+    w = np.asarray(w, dtype=float)
+    return a0 / (2 * w) + a1 * w / 2
 
 
 def sdof_response(w, zeta, a_g, dt):
@@ -344,6 +373,28 @@ if __name__ == "__main__":
     ax3.grid(alpha=0.3)
     fig3.tight_layout()
     fig3.savefig(OUT / "response_spectrum.png", dpi=120)
+
+    # Rayleigh damping: damping ratio against mode number for two choices of anchor modes
+    modes_n = np.arange(1, N_FLOORS + 1)
+    fig4, ax4 = plt.subplots(figsize=(5.8, 4))
+    ax4.axhline(100 * ZETA, color="0.5", ls=":", label="modal damping: 5% in every mode")
+    for pair, col, mk in (((0, 2), "#003f7f", "o"), ((0, 9), "#c86a00", "s")):
+        Cr, a0r, a1r = rayleigh_damping(M, K, w, pair)
+        ax4.plot(modes_n, 100 * rayleigh_ratio(w, a0r, a1r), mk + "-", color=col,
+                 label=f"Rayleigh, 5% at modes {pair[0] + 1} and {pair[1] + 1}")
+        ax4.plot([pair[0] + 1, pair[1] + 1], [5, 5], mk, ms=11, mfc="none", color=col)
+    ax4.set_xlabel("mode number")
+    ax4.set_ylabel("damping ratio (percent of critical)")
+    ax4.set_title("Rayleigh damping is not the same in every mode")
+    ax4.set_ylim(0, 14)
+    ax4.legend(fontsize=7.5)
+    ax4.grid(alpha=0.3)
+    fig4.tight_layout()
+    fig4.savefig(OUT / "rayleigh_damping.png", dpi=120)
+    Cr, a0r, a1r = rayleigh_damping(M, K, w, (0, 2))
+    ur, _, _ = newmark(M, Cr, K, ag, dt)
+    print("Rayleigh (modes 1 and 3): a0 =", round(a0r, 4), "a1 =", round(a1r, 5),
+          " roof peak (mm):", round(1e3 * np.abs(ur[:, -1]).max(), 2), " vs modal damping:", round(1e3 * np.abs(un[:, -1]).max(), 2))
 
 # %% [markdown]
 # ## Where this stops

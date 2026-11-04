@@ -186,6 +186,30 @@ def run_checks(L):
     M1, K1 = L.shear_building(1, m, k)
     w1, _ = L.modes(M1, K1)
     checks.append(("edge: one storey reduces to w = sqrt(k/m) from Session 2", abs(w1[0] - np.sqrt(k / m)) < 1e-9))
+    # ---- Rayleigh damping -----------------------------------------------------------------------
+    for pair in ((0, 2), (0, 9), (1, 4)):
+        Cr, a0r, a1r = L.rayleigh_damping(M, K, w, pair)
+        zr = L.rayleigh_ratio(w, a0r, a1r)
+        checks.append((f"Rayleigh damping anchored at modes {pair[0] + 1} and {pair[1] + 1}: 5% at both (got {100 * zr[pair[0]]:.3f}%, {100 * zr[pair[1]]:.3f}%)",
+                       abs(zr[pair[0]] - 0.05) < 1e-12 and abs(zr[pair[1]] - 0.05) < 1e-12))
+    Cr, a0r, a1r = L.rayleigh_damping(M, K, w, (0, 2))
+    D = phi.T @ Cr @ phi
+    checks.append(("Rayleigh C is diagonal in the modes and phi^T C phi = 2 zeta(w) w (an independent check of the formula)",
+                   np.abs(D - np.diag(np.diag(D))).max() < 1e-6 * np.diag(D).max()
+                   and np.allclose(np.diag(D), 2 * w * L.rayleigh_ratio(w, a0r, a1r), rtol=1e-9)))
+    zr = L.rayleigh_ratio(w, a0r, a1r)
+    checks.append(("with modes 1 and 3 anchored, mode 2 is below 5% and every mode above 3 is above 5%",
+                   zr[1] < 0.05 and np.all(zr[3:] > 0.05)))
+    a0u, a1u = L.rayleigh_coefficients(10.0, 40.0, 0.02, 0.05)
+    checks.append(("different targets work too: 2% at 10 rad/s and 5% at 40 rad/s",
+                   abs(L.rayleigh_ratio(10.0, a0u, a1u) - 0.02) < 1e-12 and abs(L.rayleigh_ratio(40.0, a0u, a1u) - 0.05) < 1e-12))
+    ag_ = L.synthetic_ground()
+    dt_ = ag_[0][1] - ag_[0][0]
+    u_mod = L.newmark(M, L.damping_matrix(M, phi, w), K, ag_[1], dt_)[0]
+    u_ray = L.newmark(M, Cr, K, ag_[1], dt_)[0]
+    pk_m, pk_r = np.abs(u_mod[:, -1]).max(), np.abs(u_ray[:, -1]).max()
+    checks.append((f"same 5% in the dominant modes gives about the same roof peak: modal {pk_m * 1e3:.1f} mm, Rayleigh {pk_r * 1e3:.1f} mm (within 5%)",
+                   abs(pk_r - pk_m) / pk_m < 0.05))
     return checks
 
 

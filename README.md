@@ -9,11 +9,11 @@ openbuildingsway teaches multi-degree-of-freedom vibration, from one mass on a s
 - **Start from one spring.** Session 1 needs only school algebra and a square root; every symbol is explained.
 - **See it sway.** Every session ships a slider app that runs in the browser, with labelled graphs and a challenge.
 - **Trust the numbers.** Mode shapes are checked against an exact formula and two time-domain solvers must agree; the checkpoint prints PASS or FAIL.
-- **Build the missing half.** The repo stops at Session 3 on purpose; the roadmap shows the path to the Target.
+- **Build the missing half.** The repo stops at Session 4 on purpose; the roadmap shows the path to the Target.
 
 [Target](#the-target) · [Who is this for](#who-is-this-for) · [Quick start](#quick-start) · [Sessions](#sessions) · [Roadmap](#roadmap) · [Contribute](#contribute) · [Explainer PDF](docs/explainer.pdf)
 
-> **This repo is incomplete on purpose.** Sessions 1 to 3 are here and fully working. The finished Target below is a preview of what the community can build next. We show you the path, not the code. Sessions 4 and up are yours.
+> **This repo is incomplete on purpose.** Sessions 1 to 4 are here and fully working. The finished Target below is a preview of what the community can build next. We show you the path, not the code. Sessions 5 and up are yours.
 
 ## The Target
 
@@ -79,6 +79,7 @@ Every session also opens in your browser with sliders (no install): [live apps](
 | 1 | [A building is a mass on a spring](sessions/session-01/README.md) | Level 1: conceptual interactive model | 60 min | [open](https://krunalpanchal1995.github.io/openbuildingsway/session-01/) |
 | 2 | [One storey, one rhythm: resonance and stiffness design](sessions/session-02/README.md) | Level 2: mathematical engineering model | 75 min | [open](https://krunalpanchal1995.github.io/openbuildingsway/session-02/) |
 | 3 | [Many floors, many modes: a ten-storey frame in an earthquake](sessions/session-03/README.md) | Level 3: simulation and validation | 90 min | [open](https://krunalpanchal1995.github.io/openbuildingsway/session-03/) |
+| 4 | [The response-spectrum shortcut: base shear without a time history](sessions/session-04/README.md) | Level 3: simulation and validation | 90 min | [open](https://krunalpanchal1995.github.io/openbuildingsway/session-04/) |
 
 Each session follows the same six steps: A real-world problem, B concept and theory, C visual explanation, D interactive simulation, E worked example and experiment, F assessment and design challenge. Each ends with `checkpoint.py`, which prints `PASS` or `FAIL` against reference numbers. Session 3 also contains the real-world mini-project: **Is this 10-storey frame in danger from a 1 s ground period? Fix it by stiffening**.
 
@@ -89,14 +90,15 @@ flowchart LR
   S1[Session 1<br/>A building is a mass on a spring]
   S2[Session 2<br/>One storey, one rhythm: resonance and stiffness design]
   S3[Session 3<br/>Many floors, many modes: a ten-storey frame in an earthquake]
-  R[Roadmap S4+<br/>YOU build this]
+  S4[Session 4<br/>The response-spectrum shortcut: base shear without a time history]
+  R[Roadmap S5+<br/>YOU build this]
   T((Target))
-  S1 --> S2 --> S3 --> R --> T
+  S1 --> S2 --> S3 --> S4 --> R --> T
 ```
 
 | Folder or file | What is inside |
 |---|---|
-| `sessions/` | three sessions: README (A-F), `lesson.py`, notebook, live app, exercises, activity sheet, checkpoint |
+| `sessions/` | four sessions: README (A-F), `lesson.py`, notebook, live app, exercises, activity sheet, checkpoint |
 | `promo/` | the Target: media, live links, and the roadmap (path only) |
 | `docs/` | `explainer.tex` and the built `explainer.pdf` |
 | `tests/` | runs every lesson and checkpoint headless |
@@ -108,7 +110,6 @@ flowchart LR
 
 | Milestone | What you will build | Difficulty |
 |---|---|---|
-| Session 4: Response-spectrum shortcut | A function that takes the response spectrum of the record and the modal data of the 10-storey frame and returns a base-shear estimate. | intermediate |
 | Session 5: Rayleigh damping instead of modal damping | A damping matrix built from two coefficients that give 5 percent at modes 1 and 3. | intermediate |
 | Session 6: Tune the mass damper | A search over damper tuning and damper damping, averaged over six random records. | advanced |
 | Session 7: A real record and real periods | A loader for a public ground-motion record, with the dominant period found from its Fourier spectrum. | advanced |

@@ -18,11 +18,12 @@ A building is a stack of floors held up by springy columns, and when the ground 
 \section*{The end goal}
 Predict building sway in an earthquake with multi-DOF vibration. The end goal is predicting building sway in an earthquake with multi-degree-of-freedom vibration: periods, mode shapes, drift and base shear for a shear building, validated against exact results. It is an educational model, never a method for seismic design, which needs qualified engineers, building codes and far richer models.
 
-\section*{How the three sessions build up}
+\section*{How the four sessions build up}
 \begin{enumerate}[nosep]
 \item \textbf{Session 1: A building is a mass on a spring} (Level 1, conceptual interactive model, 60 min).
 \item \textbf{Session 2: One storey, one rhythm: resonance and stiffness design} (Level 2, mathematical engineering model, 75 min).
 \item \textbf{Session 3: Many floors, many modes: a ten-storey frame in an earthquake} (Level 3, simulation and validation, 90 min).
+\item \textbf{Session 4: The response-spectrum shortcut: base shear without a time history} (Level 3, simulation and validation, 90 min).
 \end{enumerate}
 
 \section{Session 1: A building is a mass on a spring}
@@ -213,12 +214,81 @@ Find the periods, mode shapes and effective masses of a two-storey building by h
 \item \textbf{Design and optimisation challenge.} Design: the first storey is weaker than the others by a factor f (between 0.35 and 1). Find the smallest f in steps of 0.1 that keeps the first-storey drift at no more than 1.5 times the largest drift of the other storeys. Justify the trade-off.
 \end{enumerate}
 
+\section{Session 4: The response-spectrum shortcut: base shear without a time history}
+
+\subsection*{A. Real-world problem}
+A design office has to check hundreds of buildings and cannot run a 2400-step time history for each one. The usual shortcut skips the time history: shake a family of simple one-degree-of-freedom oscillators with the ground record once, call the largest displacement of each one the *response spectrum*, then read off one number per mode and combine the modes. For the 10-storey frame of Session 3 (floors of 200 tonnes, storeys of 350 MN/m) the full run gives a peak base shear of 8.77 MN. How close does the shortcut get with three modes, and for which buildings does it go wrong? (Synthetic record and a made-up frame; a screening exercise, not a design method.)
+
+\subsection*{B. Concept and theory}
+\textbf{The response spectrum.} Take an oscillator of period T and damping ratio 5 percent, shake it with the record a\_g(t), and write down the largest displacement it ever reaches: S\_d(T). Repeat for many periods. The pseudo-acceleration is S\_a(T) = (2 pi / T)\textasciicircum{}2 S\_d(T): a mass m on that oscillator feels at most the force m S\_a at the peak. Dividing by the peak ground acceleration (2 m/s\textasciicircum{}2) says how many times the record is amplified at that period. A very stiff oscillator (T near 0) follows the ground, so S\_a / PGA tends to 1; for this record the amplification peaks at 4.4 around T = 0.72 s and falls to 0.19 at 3 s.
+
+\textbf{One mode.} Mode i alone would move the floors in the shape phi\_i with peak amplitude Gamma\_i S\_d(T\_i) (Gamma\_i is the participation factor of Session 3). The forces that hold that shape are F\_j = m\_j Gamma\_i phi\_j,i w\_i\textasciicircum{}2 S\_d(T\_i), and they add up to the base shear
+
+V\_i = M*\_i S\_a(T\_i), with M*\_i = Gamma\_i\textasciicircum{}2 the effective modal mass.
+
+The same force follows from the lowest storey, k\_1 Gamma\_i phi\_1,i S\_d(T\_i), and the code checks that the two agree for all ten modes. A storey shear is the sum of the floor forces above the storey.
+
+\textbf{Combining modes.} The modes do not peak at the same moment, so adding the V\_i overestimates (the sum is an upper bound). The standard rule is the square root of the sum of squares (SRSS), V = sqrt(sum V\_i\textasciicircum{}2), which assumes independent peaks and works when the periods are well separated. When two periods are close the modes peak together, and the complete quadratic combination (CQC) uses a correlation rho\_ij between the modes: 1 for equal frequencies and close to 0 when they are far apart. With equal damping zeta and r = w\_j / w\_i, rho\_ij = 8 zeta\textasciicircum{}2 (1 + r) r\textasciicircum{}1.5 / ((1 - r\textasciicircum{}2)\textasciicircum{}2 + 4 zeta\textasciicircum{}2 r (1 + r)\textasciicircum{}2). In a shear building the first two periods differ by a factor of 3, so CQC and SRSS agree here (8.983 against 8.979 MN).
+
+\begin{itemize}[nosep]
+\item T, w: period and angular frequency of a mode (s, rad/s)
+\item S\_d(T): peak displacement of an oscillator of period T (5 percent damping) (m)
+\item S\_a(T): pseudo-acceleration (2 pi / T)\textasciicircum{}2 S\_d(T) (m/s\textasciicircum{}2)
+\item PGA: peak ground acceleration of the record (2.0) (m/s\textasciicircum{}2)
+\item Gamma\_i, M*\_i: participation factor and effective modal mass of mode i (kg\textasciicircum{}(1/2), kg)
+\item V\_i: peak base shear of mode i, M*\_i S\_a(T\_i) (N)
+\item V: combined base shear (SRSS, sum or CQC) (N)
+\item rho\_ij: correlation of modes i and j in CQC (no unit)
+\end{itemize}
+
+\begin{equation*}
+\ddot q+2\zeta\omega\dot q+\omega^2q=-a_g(t),\qquad S_d(T)=\max_t|q|,\qquad S_a=\omega^2S_d
+\end{equation*}
+
+\begin{equation*}
+V_i=\omega_i^2\,\Gamma_i\,(\boldsymbol\phi_i^{\mathsf T}M\mathbf r)\,S_d(T_i)=M^*_iS_a(T_i)=k_1\Gamma_i\phi_{1,i}S_d(T_i)
+\end{equation*}
+
+\begin{equation*}
+V_{\mathrm{SRSS}}=\sqrt{\sum_iV_i^2},\qquad V_{\mathrm{sum}}=\sum_i|V_i|,\qquad V_{\mathrm{CQC}}=\sqrt{\sum_i\sum_j\rho_{ij}V_iV_j}
+\end{equation*}
+
+\begin{equation*}
+\rho_{ij}=\frac{8\zeta^2(1+r)r^{3/2}}{(1-r^2)^2+4\zeta^2r(1+r)^2},\quad r=\frac{\omega_j}{\omega_i}
+\end{equation*}
+
+\begin{center}\includegraphics[width=0.7\linewidth]{figures/s04_spectrum_modes.png}\\\small The spectrum of the record with the first three modes marked; the first mode sits in a dip.\end{center}
+
+\begin{center}\includegraphics[width=0.95\linewidth]{figures/s04_storey_shear.png}\\\small Left: modal base shears, SRSS, the plain sum and the time history. Right: peak storey shear up the building.\end{center}
+
+\begin{center}\includegraphics[width=0.7\linewidth]{figures/s04_error_vs_stiffness.png}\\\small Error of the 3-mode SRSS shortcut against the storey stiffness; magenta points are outside 5 percent.\end{center}
+
+\subsection*{E. Worked example}
+Take the two-storey building of Session 3 (m = 200 000 kg, k = 3.5e8 N/m, T1 = 0.2430 s, T2 = 0.0928 s, effective mass shares 94.72 and 5.28 percent of the total mass 400 000 kg). A made-up spectrum gives S\_a = 2.0 m/s\textasciicircum{}2 at T1 and 1.0 m/s\textasciicircum{}2 at T2. Find the modal base shears, the SRSS and the plain sum, and say how the numbers change for the 10-storey frame of Section A.
+\begin{enumerate}[nosep]
+\item Effective masses: M*\_1 = 0.9472 x 400 000 = 378 885 kg and M*\_2 = 0.0528 x 400 000 = 21 115 kg.
+\item Modal base shears V = M* S\_a: V\_1 = 378 885 x 2.0 = 757 771 N = 757.8 kN and V\_2 = 21 115 x 1.0 = 21 115 N = 21.1 kN.
+\item SRSS: sqrt(757.8\textasciicircum{}2 + 21.1\textasciicircum{}2) = sqrt(574 261 + 445) = 758.1 kN.
+\item Plain sum: 757.8 + 21.1 = 778.9 kN, which is 2.7 percent above the SRSS because the second mode is small.
+\item For the 10-storey frame the code reads S\_a from the spectrum of the record: 5.29, 2.73 and 2.19 m/s\textasciicircum{}2 at T = 1.005, 0.337 and 0.206 s; with the effective masses 1 696 000, 183 000 and 61 800 kg this gives V = 8.964, 0.498 and 0.135 MN, an SRSS of 8.979 MN and a plain sum of 9.598 MN. The full time history gives 8.775 MN.
+\end{enumerate}
+\textbf{Answer.} Two storeys: V = 757.8 and 21.1 kN, SRSS 758.1 kN, sum 778.9 kN. Ten storeys: SRSS 8.979 MN, which is 2.3 percent above the time-history peak of 8.775 MN, so the roadmap target of 5 percent is met; the plain sum is 9.4 percent above.
+
+\subsection*{F. Questions}
+\begin{enumerate}[nosep]
+\item \textbf{Conceptual.} Why does the shortcut combine the modes with the square root of the sum of squares rather than adding the modal peaks, and when could SRSS be too small?
+\item \textbf{Numerical.} A building of total mass 1.5e6 kg has a first mode that carries 80 percent of the mass and a second that carries 15 percent. The spectrum gives S\_a = 3.0 m/s\textasciicircum{}2 at the first period and 4.0 m/s\textasciicircum{}2 at the second. Find the modal base shears, the SRSS and the plain sum.
+\item \textbf{Graph and simulation interpretation.} In the spectrum figure the first mode (T = 1.00 s) sits at S\_a / PGA = 2.64, in a dip, while the peak of 4.4 is at 0.72 s. A retrofit that stiffens every storey to 700 MN/m moves the first period to 0.71 s. What does the spectrum predict for the first-mode base shear, and what does the full time history give?
+\item \textbf{Design and optimisation challenge.} The owner can choose a storey stiffness of 100, 200, ..., 1500 MN/m. The screening office accepts the shortcut only if it is within 5 percent. For which options can it use the shortcut, and what should it do for the others? Which failures are the dangerous ones?
+\end{enumerate}
+
 \section{Real-world mini-project}
 \textbf{Is this 10-storey frame in danger from a 1 s ground period? Fix it by stiffening.} A 10-storey frame has floors of 200 tonnes, storeys of 350 MN/m each, storey height 3.5 m and 5 percent damping. The city's dominant ground period is 1 s. First show that the frame is in danger: compute its first period and the amplification factor T1 / Tg from Session 2. Then use \texttt{peaks} from Session 3 to stiffen every storey by a factor from 1.0 to 4.0 in steps of 0.5. A stiffening passes when the peak roof sway is at most half of the original and the peak inter-storey drift ratio (drift divided by 3.5 m) is at most 0.5 percent.
 
+\textbf{When can the shortcut be trusted?} A screening office wants to use the 3-mode SRSS shortcut instead of a time history for the 10-storey frame, and the owner is considering stiffer columns. For storey stiffnesses from 100 to 1500 MN/m in steps of 100 (floors of 200 tonnes, the record of Session 3), compute the first period, the time-history base shear and the 3-mode SRSS estimate. The shortcut passes for a stiffness if its error is within 5 percent. Use \texttt{error\_vs\_stiffness} and \texttt{passing} from Session 4, and say which failures are on the safe side (estimate above the time history) and which are not. \textbf{Deliverable:} A script that prints a table for the 15 stiffnesses (first period, time history, estimate, error, pass or fail), reports how many pass and the range of stiffnesses that pass, and saves a plot of the error against the stiffness with the 5 percent band. Add two sentences on what the screening office should do about the failures. \textbf{Success looks like:} 12 of the 15 stiffnesses pass, namely 300 to 1400 MN/m; 100 MN/m (T1 = 1.88 s, +22.1 percent) and 200 MN/m (+6.1 percent) fail on the safe side, and 1500 MN/m (-5.4 percent) fails on the unsafe side. Your write-up notes that the time-history base shear is not smaller for stiffer frames (15.3 MN at 700 MN/m against 8.8 MN at 350 MN/m), and that the pass range depends on this one jagged record, so it should not be read as a rule.
+
 \section{The path ahead}
 \begin{enumerate}[nosep]
-\item \textbf{Session 4: Response-spectrum shortcut.} A function that takes the response spectrum of the record and the modal data of the 10-storey frame and returns a base-shear estimate.
 \item \textbf{Session 5: Rayleigh damping instead of modal damping.} A damping matrix built from two coefficients that give 5 percent at modes 1 and 3.
 \item \textbf{Session 6: Tune the mass damper.} A search over damper tuning and damper damping, averaged over six random records.
 \item \textbf{Session 7: A real record and real periods.} A loader for a public ground-motion record, with the dominant period found from its Fourier spectrum.
@@ -249,6 +319,14 @@ Find the periods, mode shapes and effective masses of a two-storey building by h
 \item \textbf{Numerical.} Hint: w\textasciicircum{}2 = lambda k / m with lambda = (3 -/+ sqrt 5) / 2, so k / m = 1000 per s\textasciicircum{}2. Solution: w1\textasciicircum{}2 = 0.382 * 1000 = 381.97 so w1 = 19.544 rad/s and T1 = 0.3215 s; w2\textasciicircum{}2 = 2.618 * 1000 = 2618.0 so w2 = 51.167 rad/s and T2 = 0.1228 s. Both periods are far shorter than 1 s, so the ratio T / Tg is below 0.33 for both and neither is near resonance; mode 1 (0.3215 s) is the closer one. Units: k / m is 1/s\textasciicircum{}2, w is in rad/s.
 \item \textbf{Graph and simulation interpretation.} Hint: Compare the two bars in storey 1 and also look at the rest of the storeys. Solution: Storey 1: 95.3 mm with a soft first storey against 25.1 mm in the uniform frame, 3.8 times as much, as drift ratio 2.7 percent against 0.72 percent. The other storeys stay near their normal drift. The weak storey concentrates the bending: the whole building above it moves with it, so the first-storey columns take the damage. This is the typical failure of buildings with an open ground floor.
 \item \textbf{Design and optimisation challenge.} Hint: Use \texttt{soft\_storey\_stiffness(factor=f)}, run Newmark and compare the first drift with the maximum of the others. Solution: At f = 0.6 the first-storey drift is 55.4 mm, 1.71 times the largest other drift: fails. At f = 0.7 it is 43.5 mm, 1.46 times: passes. So f = 0.7 (the first storey at least 70 percent as stiff as the others) is the smallest with margin; f = 0.35 gives 2.97 times. Trade-off: stiffening the ground floor costs structure and may attract more force; f = 1 gives 1.01 times, a uniform drift. Assumptions: this one synthetic record, linear behaviour, uniform masses.
+\end{enumerate}
+
+\subsection*{Session 4}
+\begin{enumerate}[nosep]
+\item \textbf{Conceptual.} Hint: Do the modes reach their peaks at the same moment? What changes if two modes have almost the same period? Solution: Each mode oscillates at its own frequency, so their peaks occur at different times and partly cancel; adding the peaks assumes they all coincide and so gives an upper bound (+9.4 percent here for three modes, against +2.3 for SRSS). SRSS treats the peaks as independent, which is a good model when the periods are well apart, as in this frame (T1 / T2 = 3). If two periods are almost equal, the two modes oscillate in step and peak together, so SRSS underestimates; CQC corrects this with a correlation rho\_ij that tends to 1 for equal frequencies (the CQC of two equal-frequency modes is their plain sum).
+\item \textbf{Numerical.} Hint: V = M* S\_a with M* = share x total mass. Solution: M*\_1 = 0.80 x 1.5e6 = 1.2e6 kg and M*\_2 = 0.15 x 1.5e6 = 2.25e5 kg. V\_1 = 1.2e6 x 3.0 = 3.6e6 N = 3.6 MN and V\_2 = 2.25e5 x 4.0 = 0.9e6 N = 0.9 MN. SRSS = sqrt(3.6\textasciicircum{}2 + 0.9\textasciicircum{}2) = sqrt(13.77) = 3.71 MN. Sum = 4.5 MN, which is 21 percent above the SRSS. Units: kg times m/s\textasciicircum{}2 is newtons.
+\item \textbf{Graph and simulation interpretation.} Hint: Compare S\_a at the two periods, and remember that V = M* S\_a with the same effective mass. Then compare 8.8 MN with the time-history base shear for 700 MN/m that the lesson prints in its stiffness table. Solution: At T = 0.71 s the spectrum is at 4.33 times the ground acceleration instead of 2.64, so S\_a rises by a factor of 4.33 / 2.64 = 1.64. The effective mass share (84.8 percent) is the same for a uniform frame, but the first-mode base shear is 14.68 MN instead of 8.96 MN, and the SRSS is 14.69 MN. The full time history at 700 MN/m gives 15.29 MN, 1.74 times the 8.78 MN of the original frame (the error of the shortcut is -4.0 percent). Stiffening moved the frame into the strongest part of the spectrum of this record, so the force it must resist rose: stiffer does not mean less force.
+\item \textbf{Design and optimisation challenge.} Hint: Use \texttt{error\_vs\_stiffness} and look at the sign of the error as well as its size: a negative error means the shortcut gives less than the time history. Solution: The shortcut is within 5 percent for 300, 400, ..., 1400 MN/m (12 of 15 options; errors from +2.5 to -4.8 percent). It fails for 100 MN/m (+22.1 percent), 200 MN/m (+6.1 percent) and 1500 MN/m (-5.4 percent). The first two overestimate, so a force limit set from the shortcut would be on the safe side, but they are too far off to be useful; the 1500 MN/m option underestimates, which is the unsafe direction, so it needs a time history. Even the passing options at 1100 to 1400 MN/m are close to the limit (-4.1 to -4.8 percent), so a careful office would run a time history for any option whose shortcut error is near the limit. One synthetic record decides these numbers; with a real design spectrum the pass range would be different.
 \end{enumerate}
 
 \section{How to join}

@@ -2,16 +2,6 @@
 
 This is the path, not the code. Each milestone says what you learn, what you build, and how you know it works. Pick one and open a pull request. See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## Session 4: Response-spectrum shortcut
-
-**You will learn:** How engineers estimate peak response without a time-history run: read each mode's peak from the spectrum and combine modes with the square root of the sum of squares (SRSS).
-
-**You will build:** A function that takes the response spectrum of the record and the modal data of the 10-storey frame and returns a base-shear estimate.
-
-**Checkpoint (not met by the shipped code):** The first three modes combined by SRSS give a peak base shear within 5 percent of the 8.77 MN found by the full time-history run (the shipped code has no spectrum-based estimate at all).
-
-**Difficulty:** intermediate
-
 ## Session 5: Rayleigh damping instead of modal damping
 
 **You will learn:** Why real models often use C = a0 M + a1 K, and what it does to the high modes.
